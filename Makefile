@@ -12,7 +12,8 @@ DEBUG_OBJ_PATH		=	debug_obj/
 CC			=	g++
 SRC_PATH	=	srcs/
 INCLUDES	=	-Iincludes
-SRC_NAME	=	main.cpp
+SRC_NAME	=	main.cpp		\
+				model.cpp
 
 OBJ_NAME	=	$(SRC_NAME:.cpp=.o)
 OBJ		=	$(addprefix $(OBJ_PATH), $(OBJ_NAME))
