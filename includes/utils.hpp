@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 00:30:45 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/09/24 23:17:34 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/09/25 01:11:52 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,12 @@
 namespace scop {
 	struct Vertex {
 		double x, y, z;
+	};
+	struct Vec3 {
+		double x, y, z;
+	};
+	struct Vec4 {
+		double x, y, z, w;
 	};
 
 	struct Face {

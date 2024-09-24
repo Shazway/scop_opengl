@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 00:06:10 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/09/25 00:09:16 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/09/25 01:54:03 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,28 @@ void init() {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f); 
 }
 
+// Keys outside of GLUT constants range
+void specialKeyhook(unsigned char key, int x, int y) {
+	if (key == '+')
+		obj.move(0.0, 0.0, 0.1);
+	else if (key == '-')
+		obj.move(0.0, 0.0, -0.1);
+	glutPostRedisplay();
+}
+
+// Keys within range of GLUT constants
+void keyhook(int key, int x, int y) {
+	if (key == GLUT_KEY_UP)
+		obj.move(0.0, 0.1, 0.0);
+	else if (key == GLUT_KEY_DOWN)
+		obj.move(0.0, -0.1, 0.0);
+	else if (key == GLUT_KEY_LEFT)
+		obj.move(-0.1, 0.0, 0.0);
+	else if (key == GLUT_KEY_RIGHT)
+		obj.move(0.1, 0.0, 0.0);
+	glutPostRedisplay();
+}
+
 void drawObj() {
 	int colorIndex = 0;
 	for (const auto& face : obj.faces) {
@@ -59,7 +81,6 @@ void drawObj() {
 			const Vertex& v = obj.vertices[idx];
 			glVertex3f(v.x, v.y, v.z);
 		}
-
 		glEnd();
 	}
 }
@@ -68,11 +89,10 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
-	// Move back to view object
-	glTranslatef(0.0f, 0.0f, -10.0f);
-
+	// Apply position to the object
+	glTranslatef(obj.position.x, obj.position.y, obj.position.z);
 	// Rotate object (right rotation)
-	glRotatef(angle, 0.0f, -1.0f, 0.0f);
+	glRotatef(angle, 0.0f, 1.0f, 0.0f);
 		
 	// Draw
 	drawObj();
@@ -119,7 +139,10 @@ int main(int argc, char** argv) {
 	init();
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
-	glutTimerFunc(16, update, 0);
+	glutTimerFunc(8, update, 0); // 8 ticks per second update, 120 fps~
+	glutSpecialFunc(keyhook);
+	glutKeyboardFunc(specialKeyhook);
+
 	glutMainLoop();
 	return 0;
 }

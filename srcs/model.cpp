@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 23:44:09 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/09/25 00:10:55 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/09/25 01:13:47 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ namespace scop {
 			else if (type == "o")
 				iss >> name;
 		}
-    	// Centering formula
+		// Centering formula
 		double centerX = (xmin + xmax) / 2.0;
 		double centerY = (ymin + ymax) / 2.0;
 		double centerZ = (zmin + zmax) / 2.0;
@@ -75,5 +75,12 @@ namespace scop {
 			vertex.z -= centerZ;
 		}
 		return true;
+	}
+
+	void Model::move(double dx, double dy, double dz)
+	{
+		position.x += dx;
+		position.y += dy;
+		position.z += dz;
 	}
 };
