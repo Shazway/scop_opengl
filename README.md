@@ -8,6 +8,6 @@ GLM (OpenGL Mathematics): For handling matrix and vector operations.
 
 Installing Dependencies on Ubuntu (or WSL)
 You can install the necessary libraries using the following commands:
-sudo apt-get update
-sudo apt-get install libglew-dev libglfw3-dev libglm-dev
-sudo apt-get install freeglut3-dev
+sudo apt update
+sudo apt install libglew-dev libglfw3-dev libglm-dev
+sudo apt install freeglut3-dev
