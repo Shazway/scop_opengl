@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 00:06:10 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/09/25 02:09:26 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/09/25 02:44:57 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,19 @@ const std::vector<Color> colors = {
 	{0.0f, 0.5f, 0.5f},  // Teal
 };
 
+const std::vector<Color> alt_colors = {
+	{0.0f, 1.0f, 1.0f},  // Cyan
+	{0.5f, 0.5f, 0.5f},  // Gray
+	{1.0f, 0.5f, 0.0f},  // Orange
+	{0.5f, 0.0f, 0.5f},  // Purple
+	{0.0f, 0.5f, 0.5f},  // Teal
+	{1.0f, 0.0f, 0.0f},  // Red
+	{0.0f, 1.0f, 0.0f},  // Green
+	{0.0f, 0.0f, 1.0f},  // Blue
+	{1.0f, 1.0f, 0.0f},  // Yellow
+	{1.0f, 0.0f, 1.0f},  // Magenta
+};
+
 const double movespeed = 0.1;
 
 //TODO remove globals
@@ -39,28 +52,29 @@ bool keyStates[256];
 // Rotation angle
 float angle = 0.0f;
 
-void init() {
-	glEnable(GL_DEPTH_TEST);
-	// Grey background
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f); 
-}
-
-void keyPress(unsigned char key, int x, int y)
-{
+void keyPress(unsigned char key, int x, int y) {
 	keyStates[key] = true;
+	if (key == 't') obj.applyTextures = !obj.applyTextures;
+	if (key == 'r') obj.rotateObj = !obj.rotateObj;
 }
 
-void keyRelease(unsigned char key, int x, int y)
-{
+void keyRelease(unsigned char key, int x, int y) {
 	keyStates[key] = false;
 }
 
 void drawObj() {
 	int colorIndex = 0;
 	for (const auto& face : obj.faces) {
-		// Cycle through the color list for each face
-		const auto& color = colors[colorIndex % colors.size()];
-		glColor3f(color.r, color.g, color.b);
+		if (obj.applyTextures == false)
+		{
+			// Cycle through the colors list for each face
+			const auto& color = colors[colorIndex % colors.size()];
+			glColor3f(color.r, color.g, color.b);
+		}
+		else
+		{
+			//apply the textures
+		}
 		colorIndex++;
 
 		// Triangles or quads
@@ -85,7 +99,7 @@ void display() {
 	glTranslatef(obj.position.x, obj.position.y, obj.position.z);
 	// Rotate object (right rotation)
 	glRotatef(angle, 0.0f, 1.0f, 0.0f);
-		
+
 	// Draw
 	drawObj();
 	glutSwapBuffers();
@@ -100,9 +114,12 @@ void update(int value) {
 	if (keyStates['+']) obj.position.z -= movespeed;
 	if (keyStates['-']) obj.position.z += movespeed;
 
-	angle += 2.0f;
-	if (angle > 360.0f)
-		angle -= 360.0f;
+	if (obj.rotateObj)
+	{
+		angle += 2.0f;
+		if (angle > 360.0f)
+			angle -= 360.0f;
+	}
 	glutPostRedisplay();
 	glutTimerFunc(16, update, 0);  // Call update every 16 milliseconds (~60 FPS)
 }
@@ -118,7 +135,25 @@ void reshape(int width, int height) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
-int main(int argc, char** argv) {
+void initGlutWindow(int ac, char **av) {
+	glutInit(&ac, av);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+	glutInitWindowSize(W_WIDTH, W_HEIGHT);
+	glutCreateWindow(obj.name.c_str());
+	glEnable(GL_DEPTH_TEST);
+	// Grey background
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f); 
+}
+
+void initGlutEvents() {
+	glutDisplayFunc(display);
+	glutReshapeFunc(reshape);
+	glutTimerFunc(8, update, 0); // 8 ticks per second update, 120 fps~
+	glutKeyboardFunc(keyPress);
+	glutKeyboardUpFunc(keyRelease);
+}
+
+int main(int argc, char **argv) {
 	if (argc == 1)
 	{
 		std::cerr << "Error: Missing path to obj file" << std::endl;
@@ -130,19 +165,8 @@ int main(int argc, char** argv) {
 		std::cerr << "Error parsing file" << std::endl;
 		return 1;
 	}
-
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-	glutInitWindowSize(800, 600);
-	glutCreateWindow(obj.name.c_str());
-	init();
-	glutDisplayFunc(display);
-	glutReshapeFunc(reshape);
-	glutTimerFunc(8, update, 0); // 8 ticks per second update, 120 fps~
-	// glutSpecialFunc(keyhook);
-	// glutKeyboardFunc(specialKeyhook);
-	glutKeyboardFunc(keyPress);
-	glutKeyboardUpFunc(keyRelease);
+	initGlutWindow(argc, argv);
+	initGlutEvents();
 	glutMainLoop();
 	return 0;
 }

@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 00:30:45 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/09/25 01:11:52 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/09/25 02:36:57 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,9 @@
 #include <GL/glut.h>
 #include <array>
 #include <limits>
+
+#define W_WIDTH 800
+#define W_HEIGHT 600
 
 namespace scop {
 	struct Vertex {
