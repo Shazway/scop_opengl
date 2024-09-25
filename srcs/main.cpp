@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 00:06:10 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/09/25 02:44:57 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/09/25 02:48:34 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,12 +53,16 @@ bool keyStates[256];
 float angle = 0.0f;
 
 void keyPress(unsigned char key, int x, int y) {
+	(void)x;
+	(void)y;
 	keyStates[key] = true;
 	if (key == 't') obj.applyTextures = !obj.applyTextures;
 	if (key == 'r') obj.rotateObj = !obj.rotateObj;
 }
 
 void keyRelease(unsigned char key, int x, int y) {
+	(void)x;
+	(void)y;
 	keyStates[key] = false;
 }
 

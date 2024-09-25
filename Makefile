@@ -1,10 +1,10 @@
 NAME		=	scop
 DEBUG_NAME	=	scopDebug
 
-LDFLAGS =	-Wall -Wextra -Werror -lGL -lGLU -lglut -lGLEW
+LDFLAGS =	-lGL -lGLU -lglut -lGLEW
 
-CFLAGS	=	-O2 -g3
-DEBUG_CFLAGS	=	-DNDEBUG -O2 -g3
+CFLAGS	=	-Wall -Wextra -Werror -O2 -g3
+DEBUG_CFLAGS	=	-DNDEBUG -Wall -Wextra -Werror -O2 -g3
 
 OBJ_PATH		=	obj/
 DEBUG_OBJ_PATH		=	debug_obj/
