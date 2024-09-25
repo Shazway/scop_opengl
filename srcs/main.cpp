@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 00:06:10 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/09/25 01:54:03 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/09/25 02:09:26 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,12 @@ const std::vector<Color> colors = {
 	{0.5f, 0.0f, 0.5f},  // Purple
 	{0.0f, 0.5f, 0.5f},  // Teal
 };
+
+const double movespeed = 0.1;
+
 //TODO remove globals
 Model obj;
+bool keyStates[256];
 
 // Rotation angle
 float angle = 0.0f;
@@ -41,26 +45,14 @@ void init() {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f); 
 }
 
-// Keys outside of GLUT constants range
-void specialKeyhook(unsigned char key, int x, int y) {
-	if (key == '+')
-		obj.move(0.0, 0.0, 0.1);
-	else if (key == '-')
-		obj.move(0.0, 0.0, -0.1);
-	glutPostRedisplay();
+void keyPress(unsigned char key, int x, int y)
+{
+	keyStates[key] = true;
 }
 
-// Keys within range of GLUT constants
-void keyhook(int key, int x, int y) {
-	if (key == GLUT_KEY_UP)
-		obj.move(0.0, 0.1, 0.0);
-	else if (key == GLUT_KEY_DOWN)
-		obj.move(0.0, -0.1, 0.0);
-	else if (key == GLUT_KEY_LEFT)
-		obj.move(-0.1, 0.0, 0.0);
-	else if (key == GLUT_KEY_RIGHT)
-		obj.move(0.1, 0.0, 0.0);
-	glutPostRedisplay();
+void keyRelease(unsigned char key, int x, int y)
+{
+	keyStates[key] = false;
 }
 
 void drawObj() {
@@ -101,6 +93,13 @@ void display() {
 
 void update(int value) {
 	(void)value;
+	if (keyStates['z']) obj.position.y += movespeed;
+	if (keyStates['q']) obj.position.x -= movespeed;
+	if (keyStates['s']) obj.position.y -= movespeed;
+	if (keyStates['d']) obj.position.x += movespeed;
+	if (keyStates['+']) obj.position.z -= movespeed;
+	if (keyStates['-']) obj.position.z += movespeed;
+
 	angle += 2.0f;
 	if (angle > 360.0f)
 		angle -= 360.0f;
@@ -140,9 +139,10 @@ int main(int argc, char** argv) {
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 	glutTimerFunc(8, update, 0); // 8 ticks per second update, 120 fps~
-	glutSpecialFunc(keyhook);
-	glutKeyboardFunc(specialKeyhook);
-
+	// glutSpecialFunc(keyhook);
+	// glutKeyboardFunc(specialKeyhook);
+	glutKeyboardFunc(keyPress);
+	glutKeyboardUpFunc(keyRelease);
 	glutMainLoop();
 	return 0;
 }
