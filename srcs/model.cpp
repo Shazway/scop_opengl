@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 23:44:09 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/09/25 01:13:47 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/09/28 20:16:06 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,7 @@ namespace scop {
 		std::ifstream objFile(path);
 		std::string line;
 
-		if (!objFile.is_open())
-		{
+		if (!objFile.is_open()) {
 			std::cerr << "Couldn't open .obj file, wrong path: [" << path << "] given" << std::endl;
 			return false;
 		}
@@ -39,7 +38,7 @@ namespace scop {
 			if (type == "v") {
 				Vertex v;
 				iss >> v.x >> v.y >> v.z;
-				vertices.push_back(v);
+				vertices.emplace_back(v);
 				// Check if further bounds found at each vertex
 				if (v.x < xmin) xmin = v.x;
 				if (v.x > xmax) xmax = v.x;
@@ -48,17 +47,31 @@ namespace scop {
 				if (v.z < zmin) zmin = v.z;
 				if (v.z > zmax) zmax = v.z;
 			}
+			// Texture coordinates
+			else if (type == "vt") {
+				texture_coord vt = {0, 0};
+				iss >> vt.u >> vt.v;
+				texture_coords.emplace_back(vt);
+			}
 			// Parse face: ignore texture/normal and only use vertex indices for now
 			else if (type == "f") {
 				Face f;
 				std::string vertex;
 				while (iss >> vertex) {
 					std::stringstream ss(vertex);
-					std::string vertexIndex;
+					std::string vertexIndex("");
+					std::string textureIndex("");
+
 					std::getline(ss, vertexIndex, '/');
-					f.vertexIndices.push_back(std::stoi(vertexIndex) - 1);
+					std::getline(ss, textureIndex, '/');
+					f.vertexIndices.emplace_back(atoi(vertexIndex.c_str()) - 1);
+					// Some obj files don't have 'vt' (no textures)
+					if (!texture_coords.empty())
+					{
+						f.textureIndices.emplace_back(atoi(textureIndex.c_str()) - 1);
+					}
 				}
-				faces.push_back(f);
+				faces.emplace_back(f);
 			}
 			else if (type == "o")
 				iss >> name;
@@ -74,6 +87,7 @@ namespace scop {
 			vertex.y -= centerY;
 			vertex.z -= centerZ;
 		}
+		std::cout << (*this) << std::endl;
 		return true;
 	}
 
@@ -82,5 +96,61 @@ namespace scop {
 		position.x += dx;
 		position.y += dy;
 		position.z += dz;
+	}
+
+	std::ostream& operator<<(std::ostream &os, const std::vector<int> &vec) {
+		os << "[";
+		for (size_t i = 0; i < vec.size(); i++)
+		{
+			os << vec[i];
+			if (i < vec.size() - 1)
+				os << " ";
+		}
+		os << "]";
+		return (os);
+	}
+
+	std::ostream& operator<<(std::ostream& os, const Model& model)
+	{
+		os << "Name: " << "[" << model.name << "]" << std::endl;
+		os << "Vertices: " << std::endl;
+		for (size_t i = 0; i < model.vertices.size(); i++) {
+			os << "i: " << i << " [" <<
+			model.vertices[i].x << ", " <<
+			model.vertices[i].y << ", " <<
+			model.vertices[i].z << "]" << std::endl;
+		}
+		os << std::endl;
+
+		os << "Faces: " << model.faces.size() << std::endl;
+		for (size_t i = 0; i < model.faces.size(); i++) {
+			os << "Face index: " << i << std::endl;
+			os << "-------------------" << std::endl;
+			os << "Vertex indices" << std::endl;
+			os << model.faces[i].vertexIndices << std::endl;
+			os << "-------------------" << std::endl;
+			os << "Texture indices" << std::endl;
+			os << model.faces[i].textureIndices << std::endl;
+			os << "-------------------" << std::endl;
+		}
+		os << std::endl;
+		
+		os << "Texcoords: " << std::endl;
+		for (size_t i = 0; i < model.texture_coords.size(); i++) {
+			os << "i: " << i << " [" <<
+			model.texture_coords[i].u << ", " <<
+			model.texture_coords[i].v << std::endl;
+		}
+		os << std::endl;
+
+		os << "Position: " << "[x: " << model.position.x << "]";
+		os << "[y: " << model.position.y << "]";
+		os << "[z: " << model.position.z << "]" << std::endl;
+		os << std::endl;
+
+		os << "applyTextures: " << model.applyTextures << std::endl;
+		os << "xRotation: " << model.xRotation << std::endl;
+		os << "yRotation: " << model.yRotation;
+		return (os);
 	}
 };
