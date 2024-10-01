@@ -29,3 +29,5 @@ Rotating the object:
 'X'		: Toggle X axis rotation
 'Y'		: Toggle Y axis rotation
 'R'		: Stop all rotations
+'J'		: Accelerate rotations
+'K'		: Decelerate rotations
