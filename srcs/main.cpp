@@ -6,52 +6,21 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 00:06:10 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/09/28 20:05:48 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/10/01 18:41:18 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "utils.hpp"
+#include "scop.hpp"
 #include "model.hpp"
+#include "matrix.hpp"
+
 using namespace scop;
 
-// Constants
-//r, g, b
-//Panel of colors to distinguish faces
-const std::vector<Color> colors = {
-	{1.0f, 0.0f, 0.0f},  // Red
-	{0.0f, 1.0f, 0.0f},  // Green
-	{0.0f, 0.0f, 1.0f},  // Blue
-	{1.0f, 1.0f, 0.0f},  // Yellow
-	{1.0f, 0.0f, 1.0f},  // Magenta
-	{0.0f, 1.0f, 1.0f},  // Cyan
-	{0.5f, 0.5f, 0.5f},  // Gray
-	{1.0f, 0.5f, 0.0f},  // Orange
-	{0.5f, 0.0f, 0.5f},  // Purple
-	{0.0f, 0.5f, 0.5f},  // Teal
-};
-
-const std::vector<Color> grey_nuances = {
-	{0.1f, 0.1f, 0.1f},
-	{0.2f, 0.2f, 0.2f},
-	{0.3f, 0.3f, 0.3f},
-	{0.4f, 0.4f, 0.4f},
-	{0.5f, 0.5f, 0.5f},
-	{0.6f, 0.6f, 0.6f},
-	{0.7f, 0.7f, 0.7f},
-	{0.8f, 0.8f, 0.8f},
-};
-
-const double movespeed = 0.1;
-
 // Globals
-//TODO remove globals
 Model obj;
-GLuint textureID = 0;
 bool keyStates[256];
 
-// Rotation angles
-float xangle = 0.0f;
-float yangle = 0.0f;
+mat4 projectionMatrix;
 
 rgb *loadPPM(const std::string &path, int &width, int &height) {
 	std::ifstream file(path, std::ios::binary);
@@ -105,16 +74,17 @@ GLuint loadTexture(const std::string& filename) {
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
-	// Upload the pixel data to the texture (note: the data is still RGB, so format is GL_RGB)
+	// Upload the pixel data to the texture
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 
-	// Set texture parameters// Change wrapping mode here
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);  // or GL_CLAMP_TO_BORDER
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);  // or GL_CLAMP_TO_BORDER
+	// Set texture parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	delete[] data;  // Free the RGB data after uploading
+	// Free the RGB data after uploading
+	delete[] data;
 
 	return textureID;
 }
@@ -127,6 +97,8 @@ void keyPress(unsigned char key, int x, int y) {
 	if (key == 'x') obj.xRotation = !obj.xRotation;
 	if (key == 'y') obj.yRotation = !obj.yRotation;
 	if (key == 'r') obj.yRotation = obj.xRotation = false; // Stop all rotations
+	if (key == 'j') obj.rotationspeed += 0.01;
+	if (key == 'k') obj.rotationspeed -= 0.01;
 	if (key == 27) {
 		// TODO: exit properly when pressing escape
 	}
@@ -142,7 +114,7 @@ void drawObj() {
 	int colorIndex = 0;
 	// Apply textures if active and available
 	if (obj.applyTextures && !obj.texture_coords.empty()) {
-		glBindTexture(GL_TEXTURE_2D, textureID);
+		glBindTexture(GL_TEXTURE_2D, obj.textureID);
 		glEnable(GL_TEXTURE_2D);
 	}
 	// Iterate on all faces of the model
@@ -179,7 +151,7 @@ void drawObj() {
 				// Set texture coordinates for the vertex
 				glTexCoord2f(tex.u, tex.v);
 			}
-			glVertex3f(v.x, v.y, v.z);
+			glVertex3d(v.x, v.y, v.z);
 		}
 		glEnd();
 	}
@@ -189,15 +161,17 @@ void drawObj() {
 
 void display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
 
-	// Apply position to the object
-	glTranslatef(obj.position.x, obj.position.y, obj.position.z);
-	glRotatef(xangle, 0.0f, 1.0f, 0.0f);
-	glRotatef(yangle, 1.0f, 0.0f, 0.0f);
+	// Matrix operations
+	glMatrixMode(GL_MODELVIEW);
+	mat4 modelMatrix = mat4::translate(obj.position.x, obj.position.y, obj.position.z);
+	modelMatrix *= mat4::rotate(obj.xangle, 0.0, 1.0, 0.0);
+	modelMatrix *= mat4::rotate(obj.yangle, 1.0, 0.0, 0.0);
+	glLoadMatrixd(modelMatrix.data[0].data());
 
-	// Draw
+	// Draw object
 	drawObj();
+
 	glutSwapBuffers();
 }
 
@@ -214,29 +188,33 @@ void update(int value) {
 
 	if (obj.xRotation)
 	{
-		xangle += 2.0f;
-		if (xangle == 362.0f)
-			xangle = 0.0f;
+		obj.xangle += obj.rotationspeed;
+		if (obj.xangle > 360.0)
+			obj.xangle = 0.0;
+		else if (obj.xangle < 0.0)
+			obj.xangle = 360.0;
 	}
 	if (obj.yRotation)
 	{
-		yangle += 2.0f;
-		if (yangle == 362.0f)
-			yangle = 0.0f;
+		obj.yangle += obj.rotationspeed;
+		if (obj.yangle > 360.0)
+			obj.yangle = 0.0;
+		else if (obj.yangle < 0.0)
+			obj.yangle = 360.0;
 	}
 	glutPostRedisplay();
-	glutTimerFunc(16, update, 0);  // Call update every 16 milliseconds (~60 FPS)
+	// Call update every 8 milliseconds (~120 FPS)
+	glutTimerFunc(8, update, 0);
 }
 
 void reshape(int width, int height) {
 	glViewport(0, 0, width, height);
+
+	// Apply projection matrix operations
 	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-		
-	// Set up perspective projection
-	gluPerspective(45.0, (float)width / height, 1.0, 100.0);
-		
-	glMatrixMode(GL_MODELVIEW);
+	projectionMatrix = mat4::identity();
+	projectionMatrix = mat4::perspective(45.0 / 180.0, (double)width / (double)height, 1.0, 100.0);
+	glLoadMatrixd(projectionMatrix.data[0].data());
 }
 
 void initGlutWindow(int ac, char **av) {
@@ -262,7 +240,7 @@ int main(int argc, char **argv) {
 		std::cerr << "Error: Missing path to obj file or texture" << std::endl;
 		std::cerr << "Try: ./scop path/to/object.obj path/to/texture.ppm" << std::endl;
 		std::cerr << "The texture must be a ppm file" << std::endl;
-		return 0;
+		return 1;
 	}
 	if (!obj.parseObj(std::string(argv[1]))) {
 		std::cerr << "Error parsing file" << std::endl;
@@ -272,7 +250,7 @@ int main(int argc, char **argv) {
 		std::cout << "No texture available for this object" << std::endl;
 	initGlutWindow(argc, argv);
 	initGlutEvents();
-	textureID = loadTexture(argv[2]);
+	obj.textureID = loadTexture(argv[2]);
 	glutMainLoop();
 	return 0;
 }

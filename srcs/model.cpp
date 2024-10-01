@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 23:44:09 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/09/28 20:16:06 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/09/28 21:03:04 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,7 +139,7 @@ namespace scop {
 		for (size_t i = 0; i < model.texture_coords.size(); i++) {
 			os << "i: " << i << " [" <<
 			model.texture_coords[i].u << ", " <<
-			model.texture_coords[i].v << std::endl;
+			model.texture_coords[i].v << "]" << std::endl;
 		}
 		os << std::endl;
 
