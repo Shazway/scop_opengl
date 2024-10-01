@@ -1,7 +1,7 @@
 NAME		=	scop
 DEBUG_NAME	=	scopDebug
 
-LDFLAGS =	-lGL -lGLU -lglut -lGLEW
+LDFLAGS =	-lGL -lGLU -lglut
 
 CFLAGS	=	-Wall -Wextra -Werror -O2 -g3
 DEBUG_CFLAGS	=	-DNDEBUG -Wall -Wextra -Werror -O2 -g3
@@ -14,7 +14,8 @@ SRC_PATH	=	srcs/
 INCLUDES	=	-Iincludes
 SRC_NAME	=	main.cpp			\
 				model.cpp			\
-				matrix.cpp
+				matrix.cpp			\
+				camera.cpp
 
 OBJ_NAME	=	$(SRC_NAME:.cpp=.o)
 OBJ		=	$(addprefix $(OBJ_PATH), $(OBJ_NAME))

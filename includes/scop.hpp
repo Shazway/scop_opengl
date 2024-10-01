@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 00:30:45 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/10/01 17:57:02 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/10/01 22:28:22 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,11 @@
 #include <memory>
 #include <cmath>
 
+#define UP 0
+#define DOWN 1
+#define LEFT 2
+#define RIGHT 3
+#define L_SHIFT 112
 #define W_WIDTH 800
 #define W_HEIGHT 600
 

@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 23:41:38 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/10/01 18:32:50 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/10/01 22:22:15 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,11 @@ namespace scop {
 			bool applyTextures = false;
 			bool xRotation = true;
 			bool yRotation = false;
-			double xangle = 0.0f;
-			double yangle = 0.0f;
+			bool cameraMode = false;
+			double xangle = 0.0;
+			double yangle = 0.0;
 			double rotationspeed = 0.01;
+			double objectspeed = 0.1;
 	};
 	std::ostream& operator<<(std::ostream &os, const Model& obj);
 	std::ostream& operator<<(std::ostream &os, const std::vector<int> &vec);
