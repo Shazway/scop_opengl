@@ -1,10 +1,7 @@
 Dependencies  
 The project requires the following dependencies to run:  
-
 OpenGL: The core graphics library.  
 GLUT (OpenGL Utility Toolkit): For managing windows, inputs, and basic rendering setup.  
-GLEW (OpenGL Extension Wrangler): Ensures the use of modern OpenGL functions.  
-GLM (OpenGL Mathematics): For handling matrix and vector operations.  
   
 Installing Dependencies on Ubuntu (or WSL)  
 You can install the necessary libraries using the following commands:  
@@ -20,10 +17,12 @@ Commands:
 Moving the model:  
 'Z', 'W': Move the object up  
 'Q', 'A': Move the object left  
-'D'		: Move the object right  
 'S'		: Move the object down  
+'D'		: Move the object right  
 '+'		: Move the object further away  
 '-'		: Move the object closer  
+'O'		: Increase the object speed  
+'P'		: Decrease the object speed  
   
 Rotating the object:  
 'X'		: Toggle X axis rotation  
@@ -31,3 +30,13 @@ Rotating the object:
 'R'		: Stop all rotations  
 'J'		: Accelerate rotations  
 'K'		: Decelerate rotations  
+  
+Camera commands:  
+'Z', 'W'		: Move forward  
+'Q', 'A'		: Move left  
+'S'				: Move down  
+'D'				: Move right  
+'LEFT_ARROW'	: Turn left  
+'RIGHT_ARROW'	: Turn right  
+'DOWN_ARROW'	: Turn down  
+'UP_ARROW'		: Turn up  
