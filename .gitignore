@@ -1,0 +1,4 @@
+.vscode/
+scop
+obj/
+*/*.o
