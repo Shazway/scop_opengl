@@ -36,6 +36,8 @@ Camera commands:
 'Q', 'A'		: Move left  
 'S'				: Move down  
 'D'				: Move right  
+'+'				: Move up  
+'-'				: Move down  
 'LEFT_ARROW'	: Turn left  
 'RIGHT_ARROW'	: Turn right  
 'DOWN_ARROW'	: Turn down  
