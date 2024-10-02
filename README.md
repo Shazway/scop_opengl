@@ -32,6 +32,7 @@ Rotating the object:
 'K'		: Decelerate rotations  
   
 Camera commands:  
+'C'					: Toggle camera mode  
 'Z', 'W'		: Move forward  
 'Q', 'A'		: Move left  
 'S'				: Move down  
