@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 00:06:10 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/10/01 23:12:00 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/10/02 02:40:33 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,7 @@ camera cam;
 mat4 projectionMatrix;
 mat4 viewMatrix;
 bool keyStates[256] = {false};
-bool arrowKeyStates[4] = {false};
-bool shiftKey = false;
+bool specialKeyStates[256] = {false};
 
 rgb *loadPPM(const std::string &path, int &width, int &height) {
 	std::ifstream file(path, std::ios::binary);
@@ -32,7 +31,6 @@ rgb *loadPPM(const std::string &path, int &width, int &height) {
 		std::cerr << "Error: Couldn't open texture file " << path << std::endl;
 		return nullptr;
 	}
-
 	std::string magicNumber;
 	file >> magicNumber;
 	if (magicNumber != "P6") {
@@ -96,20 +94,13 @@ GLuint loadTexture(const std::string& filename) {
 void specialKeyPress(int key, int x, int y) {
 	(void)x;
 	(void)y;
-	if (key == GLUT_KEY_UP) arrowKeyStates[UP] = true;
-	if (key == GLUT_KEY_DOWN) arrowKeyStates[DOWN] = true;
-	if (key == GLUT_KEY_RIGHT) arrowKeyStates[RIGHT] = true;
-	if (key == GLUT_KEY_LEFT) arrowKeyStates[LEFT] = true;
-	if (key == L_SHIFT) shiftKey = true;
+	specialKeyStates[key] = true;
 }
+
 void specialKeyRelease(int key, int x, int y) {
 	(void)x;
 	(void)y;
-	if (key == GLUT_KEY_UP) arrowKeyStates[UP] = false;
-	if (key == GLUT_KEY_DOWN) arrowKeyStates[DOWN] = false;
-	if (key == GLUT_KEY_RIGHT) arrowKeyStates[RIGHT] = false;
-	if (key == GLUT_KEY_LEFT) arrowKeyStates[LEFT] = false;
-	if (key == L_SHIFT) shiftKey = false;
+	specialKeyStates[key] = false;
 }
 
 void keyPress(unsigned char key, int x, int y) {
@@ -185,14 +176,21 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Matrix operations
+	double radX;
+	double radY;
 	glMatrixMode(GL_MODELVIEW);
-	viewMatrix = mat4::translate(cam.position.x, cam.position.y, cam.position.z);
-	viewMatrix *= mat4::rotate(cam.xangle, 0.0, 1.0, 0.0);
-	viewMatrix *= mat4::rotate(cam.yangle, 1.0, 0.0, 0.0);
+	viewMatrix = mat4::identity();
+	radX = cam.xangle * (M_PI / 180.0);
+	radY = cam.yangle * (M_PI / 180.0);
+	viewMatrix *= mat4::rotate(radX, 0.0, 1.0, 0.0);
+	viewMatrix *= mat4::rotate(radY, 1.0, 0.0, 0.0);
+	viewMatrix *= mat4::translate(cam.position.x, cam.position.y, cam.position.z);
 
 	mat4 modelMatrix = mat4::translate(obj.position.x, obj.position.y, obj.position.z);
-	modelMatrix *= mat4::rotate(obj.xangle, 0.0, 1.0, 0.0);
-	modelMatrix *= mat4::rotate(obj.yangle, 1.0, 0.0, 0.0);
+	radX = obj.xangle * (M_PI / 180.0);
+	radY = obj.yangle * (M_PI / 180.0);
+	modelMatrix *= mat4::rotate(radX, 0.0, 1.0, 0.0);
+	modelMatrix *= mat4::rotate(radY, 1.0, 0.0, 0.0);
 	glLoadMatrixd((viewMatrix * modelMatrix).data[0].data());
 
 	// Draw object
@@ -203,10 +201,12 @@ void display() {
 
 void update(int value) {
 	(void)value;
+	// std::cout << keyStates['s'] << std::endl;
+	// std::cout << specialKeyStates[L_SHIFT] << std::endl;
 	if (!obj.cameraMode) // Move the model
 	{
 		// Increasing the speed for the model
-		if (keyStates['j']) obj.rotationspeed += 0.01;;
+		if (keyStates['j']) obj.rotationspeed += 0.01;
 		if (keyStates['k']) obj.rotationspeed -= 0.01;
 		if (keyStates['o']) obj.objectspeed += 0.01;
 		if (keyStates['p']) obj.objectspeed -= 0.01;
@@ -225,25 +225,24 @@ void update(int value) {
 	else // Move the camera
 	{
 		// Camera movement
-		if (keyStates['z']) cam.position.z += cam.movementspeed;
-		if (keyStates['w']) cam.position.z += cam.movementspeed;
-		if (keyStates['q']) cam.position.x += cam.movementspeed;
-		if (keyStates['a']) cam.position.x += cam.movementspeed;
-		if (keyStates['s']) cam.position.z -= cam.movementspeed;
-		if (keyStates['d']) cam.position.x -= cam.movementspeed;
-		if (keyStates[' ']) cam.position.y -= cam.movementspeed;
-		if (shiftKey) cam.position.y += cam.movementspeed;
+		if (keyStates['z']) cam.move(1.0, 0.0);
+		if (keyStates['w']) cam.move(1.0, 0.0);
+		if (keyStates['q']) cam.move(0.0, 1.0);
+		if (keyStates['a']) cam.move(0.0, 1.0);
+		if (keyStates['s']) cam.move(-1.0, 0.0);
+		if (keyStates['d']) cam.move(0.0, -1.0);
+		if (keyStates['+']) cam.position.y -= cam.movementspeed;
+		if (keyStates['-']) cam.position.y += cam.movementspeed;
 
 		// Camera rotations
-		if (arrowKeyStates[LEFT]) cam.xangle += cam.rotationspeed;
-		if (arrowKeyStates[RIGHT]) cam.xangle -= cam.rotationspeed;
-		if (cam.xangle > 360.0) cam.xangle = 0.0;
-		if (cam.xangle < 0.0) cam.xangle = 360.0;
-		if (cam.inClampRange()) // Clamp the camera up and down movement
-		{
-			if (arrowKeyStates[UP]) cam.yangle += cam.rotationspeed;
-			if (arrowKeyStates[DOWN]) cam.yangle -= cam.rotationspeed;
-		}
+		if (specialKeyStates[GLUT_KEY_LEFT]) cam.xangle += cam.rotationspeed;
+		if (specialKeyStates[GLUT_KEY_RIGHT]) cam.xangle -= cam.rotationspeed;
+		if (specialKeyStates[GLUT_KEY_UP] && cam.yangle < 45.0) cam.yangle += cam.rotationspeed;
+		if (specialKeyStates[GLUT_KEY_DOWN] && cam.yangle > -45.0) cam.yangle -= cam.rotationspeed;
+		if (cam.xangle > 360.0)
+			cam.xangle = 0.0;
+		else if (cam.xangle < 0.0)
+			cam.xangle = 360.0;
 	}
 	if (obj.xRotation)
 	{
@@ -273,8 +272,6 @@ void reshape(int width, int height) {
 	glMatrixMode(GL_PROJECTION);
 	projectionMatrix = mat4::identity();
 	projectionMatrix *= mat4::perspective(45.0 / 180.0, (double)width / (double)height, 1.0, 100.0);
-	projectionMatrix *= mat4::rotate(cam.xangle, 0.0, 1.0, 0.0);
-	projectionMatrix *= mat4::rotate(cam.yangle, 1.0, 0.0, 0.0);
 	glLoadMatrixd((projectionMatrix).data[0].data());
 }
 
