@@ -32,6 +32,7 @@ Rotating the model:
 'K'		: Decelerate rotations  
   
 Camera commands:  
+'C'				: Toggle camera mode
 'Z', 'W'		: Move forward  
 'Q', 'A'		: Move left  
 'S'				: Move back  
@@ -42,3 +43,7 @@ Camera commands:
 'RIGHT_ARROW'	: Look right  
 'DOWN_ARROW'	: Look down  
 'UP_ARROW'		: Look up  
+  
+Other commands:  
+0	: Reset simulation  
+Esc	: Exit program  
