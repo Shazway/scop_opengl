@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 23:44:09 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/10/03 01:30:03 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/10/03 01:56:18 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,6 @@ namespace scop {
 			vertex.y -= centerY;
 			vertex.z -= centerZ;
 		}
-		std::cout << (*this) << std::endl;
 		return true;
 	}
 	void Model::move(const bool keyStates[256]) {
@@ -99,6 +98,18 @@ namespace scop {
 		if (keyStates['d']) position.x += modelspeed;
 		if (keyStates['+']) position.z -= modelspeed;
 		if (keyStates['-']) position.z += modelspeed;
+	}
+
+	void Model::reset() {
+		position = vec3(0.0, 0.0, -10.0);
+		applyTextures = false;
+		xRotation = true;
+		yRotation = false;
+		cameraMode = false;
+		xangle = 0.0;
+		yangle = 0.0;
+		rotationspeed = 1.0;
+		modelspeed = 0.1;
 	}
 
 	std::ostream& operator<<(std::ostream &os, const std::vector<int> &vec) {

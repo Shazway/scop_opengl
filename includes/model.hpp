@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 23:41:38 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/10/03 01:29:09 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/10/03 01:55:09 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ namespace scop {
 			~Model() {};
 			bool parseObj(const std::string &path);
 			void move(const bool keyStates[256]);
+			void reset();
 
 			// Parsing data
 			std::string name;

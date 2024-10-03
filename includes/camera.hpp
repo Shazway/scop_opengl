@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/01 20:26:25 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/10/02 02:21:33 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/10/03 01:56:56 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ namespace scop {
 			camera() : position{0.0, 0.0, 0.0} {};
 			~camera() {};
 			void move(double forward, double strafe);
+			void reset();
 
 			vec3 position;
 			double xangle = 0.0;

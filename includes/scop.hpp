@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 00:30:45 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/10/03 01:29:19 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/10/03 01:52:55 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,40 @@
 #include <limits>
 #include <memory>
 #include <cmath>
+
+#define COMMANDS_LIST								\
+	"Model Commands:\n"								\
+	"Moving the model relative to the origin:\n"	\
+	"'C': Toggle camera mode\n"						\
+	"'Z', 'W': Move the model up\n"					\
+	"'Q', 'A': Move the model left\n"				\
+	"'S': Move the model down\n"					\
+	"'D': Move the model right\n"					\
+	"'+': Move the model further away\n"			\
+	"'-': Move the model closer\n"					\
+	"'O': Increase the model speed\n"				\
+	"'P': Decrease the model speed\n"				\
+	"\nRotating the model:\n"						\
+	"'X': Toggle X axis rotation\n"					\
+	"'Y': Toggle Y axis rotation\n"					\
+	"'R': Stop all rotations\n"						\
+	"'J': Accelerate rotations\n"					\
+	"'K': Decelerate rotations\n"					\
+	"\nCamera commands:\n"							\
+	"'Z', 'W': Move forward\n"						\
+	"'Q', 'A': Move left\n"							\
+	"'S': Move back\n"								\
+	"'D': Move right\n"								\
+	"' ': Move up\n"								\
+	"'V': Move down\n"								\
+	"'LEFT_ARROW': Look left\n"						\
+	"'RIGHT_ARROW': Look right\n"					\
+	"'DOWN_ARROW': Look down\n"						\
+	"'UP_ARROW': Look up\n"							\
+	"\nOther commands:\n"							\
+	"'0': Reset simulation\n"						\
+	"'Esc': Exit program"
+
 
 #define W_WIDTH 800
 #define W_HEIGHT 600

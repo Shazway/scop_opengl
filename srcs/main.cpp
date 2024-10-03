@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 00:06:10 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/10/03 01:30:17 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/10/03 02:00:33 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,12 @@ void keyPress(unsigned char key, int x, int y) {
 	if (key == 'y') model.yRotation = !model.yRotation;
 	if (key == 'r') model.yRotation = model.xRotation = false; // Stop all rotations
 	if (key == 'c') model.cameraMode = !model.cameraMode; // Toggle camera mode
+	if (key == 'h') std::cout << COMMANDS_LIST << std::endl;
+	if (key == '0') {
+		std::cout << "Resetting simulation" << std::endl;
+		model.reset();
+		cam.reset();
+	}
 	if (key == 27) {
 		glutLeaveMainLoop();
 	}
@@ -299,6 +305,7 @@ int main(int argc, char **argv) {
 	}
 	if (model.texture_coords.empty())
 		std::cout << "No texture available for this object" << std::endl;
+	std::cout << "Welcome to scop! Press 'H' on your keyboard to display the available commands in the terminal" << std::endl;
 	initGlutWindow(argc, argv);
 	initGlutEvents();
 	model.textureID = loadTexture(argv[2]);

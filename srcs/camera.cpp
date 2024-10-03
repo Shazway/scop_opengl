@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/01 20:27:33 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/10/03 01:29:25 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/10/03 01:57:47 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,5 +31,12 @@ namespace scop {
 		// Update the camera position
 		position.z += (forwardX + strafeX) * movementspeed;
 		position.x += (forwardZ + strafeZ) * movementspeed;
+	}
+	void camera::reset() {
+		position = vec3(0.0, 0.0, 0.0);
+		xangle = 0.0;
+		yangle = 0.0;
+		rotationspeed = 1;
+		movementspeed = 0.1;
 	}
 };
