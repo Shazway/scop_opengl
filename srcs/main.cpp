@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 00:06:10 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/10/03 02:00:33 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/10/04 20:42:51 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,12 @@ rgb *loadPPM(const std::string &path, int &width, int &height) {
 
 	// Allocate memory for the Color data (one Color struct per pixel)
 	rgb* data = new rgb[width * height];
-		
+	
+	if (!data)
+	{
+		std::cerr << "Couldn't allocate memory for texture parsing" << std::endl;
+		return nullptr;
+	}
 	// Read the pixel data into the array of Color structs
 	file.read(reinterpret_cast<char*>(data), 3 * width * height);  // 3 bytes per pixel (Color)
 
@@ -76,12 +81,15 @@ GLuint loadTexture(const std::string& filename) {
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
+	std::vector<rgb> rgb_data(data, data + (width * height));
+	std::reverse(rgb_data.begin(), rgb_data.end());
+
 	// Upload the pixel data to the texture
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, rgb_data.data());
 
 	// Set texture parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 

@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 00:30:45 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/10/03 01:52:55 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/10/04 20:37:19 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 #include <limits>
 #include <memory>
 #include <cmath>
+#include <algorithm>
 
 #define COMMANDS_LIST								\
 	"Model Commands:\n"								\
