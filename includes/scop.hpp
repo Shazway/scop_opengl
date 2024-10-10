@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 00:30:45 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/10/04 20:37:19 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/10/10 17:31:58 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,9 @@ namespace scop {
 	};
 
 	struct Vertex {
-		double x, y, z;
+		double x = 0;
+		double y = 0;
+		double z = 0;
 	};
 
 	struct Face {
@@ -125,13 +127,12 @@ namespace scop {
 	};
 	const std::vector<Color> grey_nuances = {
 		{0.1f, 0.1f, 0.1f},
-		{0.2f, 0.2f, 0.2f},
+		{0.125f, 0.125f, 0.125f},
+		{0.25f, 0.25f, 0.25f},
 		{0.3f, 0.3f, 0.3f},
-		{0.4f, 0.4f, 0.4f},
-		{0.5f, 0.5f, 0.5f},
-		{0.6f, 0.6f, 0.6f},
-		{0.7f, 0.7f, 0.7f},
-		{0.8f, 0.8f, 0.8f},
+		{0.35f, 0.35f, 0.35f},
+		{0.5f, 0.5f, 0.5f}
 	};
+
 	const double movespeed = 0.1;
 };

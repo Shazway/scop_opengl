@@ -6,14 +6,16 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/29 19:15:49 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/10/01 18:41:01 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/10/10 17:35:59 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "matrix.hpp"
 
-namespace scop {
-	mat4::mat4() {
+namespace scop
+{
+	mat4::mat4()
+	{
 		data = {{
 			{1.0, 0.0, 0.0, 0.0},
 			{0.0, 1.0, 0.0, 0.0},
@@ -24,7 +26,8 @@ namespace scop {
 	mat4::mat4(const std::array<std::array<double, 4>, 4> &cpy) : data(cpy) { }
 
 	// Set as identity matrix
-	mat4 mat4::identity() {
+	mat4 mat4::identity()
+	{
 		mat4 result;
 		result.data = {{
 			{1.0, 0.0, 0.0, 0.0},
@@ -35,7 +38,8 @@ namespace scop {
 		return result;
 	}
 
-	mat4 mat4::translate(double x, double y, double z) {
+	mat4 mat4::translate(double x, double y, double z)
+	{
 		mat4 result;
 
 		result.data[3][0] = x;
@@ -68,7 +72,8 @@ namespace scop {
 		return result;
 	}
 
-	mat4 mat4::perspective(double fov, double aspect, double near, double far) {
+	mat4 mat4::perspective(double fov, double aspect, double near, double far)
+	{
 		mat4 result;
 		double tanHalfFov = tan(fov / 2.0);
 		double range = near - far;
@@ -83,7 +88,8 @@ namespace scop {
 		return result;
 	}
 
-	mat4 mat4::operator*(const mat4 &other) const {
+	mat4 mat4::operator*(const mat4 &other) const
+	{
 		mat4 result;
 		for (int col = 0; col < 4; ++col) {
 			for (int row = 0; row < 4; ++row) {
@@ -96,12 +102,14 @@ namespace scop {
 		return result;
 	}
 
-	mat4& mat4::operator*=(const mat4 &other) {
+	mat4& mat4::operator*=(const mat4 &other)
+	{
 		*this = *this * other;
 		return *this;
 	}
 
-	std::ostream& operator<<(std::ostream &os, const mat4& matrix) {
+	std::ostream& operator<<(std::ostream &os, const mat4& matrix)
+	{
 		os << std::endl;
 		for (const auto& row : matrix.data) {
 			os << "{ ";

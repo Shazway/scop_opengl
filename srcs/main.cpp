@@ -6,7 +6,7 @@
 /*   By: tmoragli <tmoragli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 00:06:10 by tmoragli          #+#    #+#             */
-/*   Updated: 2024/10/04 20:42:51 by tmoragli         ###   ########.fr       */
+/*   Updated: 2024/10/10 17:31:37 by tmoragli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,15 +25,18 @@ mat4 viewMatrix;
 bool keyStates[256] = {false};
 bool specialKeyStates[256] = {false};
 
-rgb *loadPPM(const std::string &path, int &width, int &height) {
+rgb *loadPPM(const std::string &path, int &width, int &height)
+{
 	std::ifstream file(path, std::ios::binary);
-	if (!file.is_open()) {
+	if (!file.is_open())
+	{
 		std::cerr << "Error: Couldn't open texture file " << path << std::endl;
 		return nullptr;
 	}
 	std::string magicNumber;
 	file >> magicNumber;
-	if (magicNumber != "P6") {
+	if (magicNumber != "P6")
+	{
 		std::cerr << "Error: Unsupported PPM format " << magicNumber << std::endl;
 		return nullptr;
 	}
@@ -44,7 +47,8 @@ rgb *loadPPM(const std::string &path, int &width, int &height) {
 	file.get();  // Eat the newline character after maxColor
 
 	// Check if the color depth is 8 bits per channel
-	if (maxColor != 255) {
+	if (maxColor != 255)
+	{
 		std::cerr << "Error: Unsupported max color value " << maxColor << std::endl;
 		return nullptr;
 	}
@@ -60,7 +64,8 @@ rgb *loadPPM(const std::string &path, int &width, int &height) {
 	// Read the pixel data into the array of Color structs
 	file.read(reinterpret_cast<char*>(data), 3 * width * height);  // 3 bytes per pixel (Color)
 
-	if (!file) {
+	if (!file)
+	{
 		std::cerr << "Error: Couldn't read texture data from " << path << std::endl;
 		delete[] data;
 		return nullptr;
@@ -69,49 +74,53 @@ rgb *loadPPM(const std::string &path, int &width, int &height) {
 	return data;
 }
 
-GLuint loadTexture(const std::string& filename) {
+bool loadTexture(const std::string& filename)
+{
 	int width, height;
 	rgb* data = loadPPM(filename, width, height);
-	if (!data) {
+	if (!data)
+	{
 		std::cerr << "Error: Couldn't load texture from " << filename << std::endl;
-		return 0;
+		return false;
 	}
 
-	GLuint textureID;
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_2D, textureID);
+	glGenTextures(1, &model.textureID);
+	glBindTexture(GL_TEXTURE_2D, model.textureID);
 
 	std::vector<rgb> rgb_data(data, data + (width * height));
 	std::reverse(rgb_data.begin(), rgb_data.end());
 
-	// Upload the pixel data to the texture
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, rgb_data.data());
-
 	// Set texture parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	
+	// Upload the pixel data to the texture
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, rgb_data.data());
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// Free the RGB data after uploading
 	delete[] data;
-
-	return textureID;
+	return true;
 }
 
-void specialKeyPress(int key, int x, int y) {
+void specialKeyPress(int key, int x, int y)
+{
 	(void)x;
 	(void)y;
 	specialKeyStates[key] = true;
 }
 
-void specialKeyRelease(int key, int x, int y) {
+void specialKeyRelease(int key, int x, int y)
+{
 	(void)x;
 	(void)y;
 	specialKeyStates[key] = false;
 }
 
-void keyPress(unsigned char key, int x, int y) {
+void keyPress(unsigned char key, int x, int y)
+{
 	(void)x;
 	(void)y;
 	keyStates[key] = true;
@@ -121,60 +130,75 @@ void keyPress(unsigned char key, int x, int y) {
 	if (key == 'r') model.yRotation = model.xRotation = false; // Stop all rotations
 	if (key == 'c') model.cameraMode = !model.cameraMode; // Toggle camera mode
 	if (key == 'h') std::cout << COMMANDS_LIST << std::endl;
-	if (key == '0') {
+	if (key == '0')
+	{
 		std::cout << "Resetting simulation" << std::endl;
 		model.reset();
 		cam.reset();
 	}
-	if (key == 27) {
+	if (key == 27)
+	{
+		glDeleteTextures(1, &model.textureID);
 		glutLeaveMainLoop();
 	}
 }
 
-void keyRelease(unsigned char key, int x, int y) {
+void keyRelease(unsigned char key, int x, int y)
+{
 	(void)x;
 	(void)y;
 	keyStates[key] = false;
 }
 
-void drawObj() {
+void drawObj()
+{
 	int colorIndex = 0;
 	// Apply textures if active and available
-	if (model.applyTextures && !model.texture_coords.empty()) {
+	if (model.applyTextures && !model.texture_coords.empty())
+	{
 		glBindTexture(GL_TEXTURE_2D, model.textureID);
 		glEnable(GL_TEXTURE_2D);
 	}
+
 	// Iterate on all faces of the model
-	for (const auto& face : model.faces) {
-		if (!model.applyTextures) {
+	for (const auto& face : model.faces)
+	{
+		if (!model.applyTextures)
+		{
 			// Cycle through the colors list for each face
 			const auto& color = grey_nuances[colorIndex % grey_nuances.size()];
 			glColor3f(color.r, color.g, color.b);
 		}
-		else if (model.applyTextures && model.texture_coords.empty()) {
+		else if (model.applyTextures && model.texture_coords.empty())
+		{
 			// Cycle through the colors list for each face
 			const auto& color = colors[colorIndex % colors.size()];
 			glColor3f(color.r, color.g, color.b);
 		}
-		// Disable colors
 		else
+			// Disable colors
 			glColor3f(1.0f, 1.0f, 1.0f);
 		colorIndex++;
 
-		// Triangles or quads
+		// Triangles quads and polygon by default
 		if (face.vertexIndices.size() == 3)
 			glBegin(GL_TRIANGLES);
 		else if (face.vertexIndices.size() == 4)
 			glBegin(GL_QUADS);
+		else
+			glBegin(GL_POLYGON);
 
-		for (size_t i = 0; i < face.vertexIndices.size(); i++) {
+		for (size_t i = 0; i < face.vertexIndices.size(); i++)
+		{
 			int vertexIndex = face.vertexIndices[i];
 			const Vertex &v = model.vertices[vertexIndex];
 
-			if (model.applyTextures && i < face.textureIndices.size()) {
+			if (model.applyTextures && i < face.textureIndices.size())
+			{
 				// Apply texture coordinates if enabled and available
 				size_t textCoordIndex = face.textureIndices[i];
 				const texture_coord &tex = model.texture_coords[textCoordIndex];
+
 				// Set texture coordinates for the vertex
 				glTexCoord2f(tex.u, tex.v);
 			}
@@ -183,10 +207,12 @@ void drawObj() {
 		glEnd();
 	}
 	if (!model.applyTextures && !model.texture_coords.empty())
+		// Disable texture
 		glDisable(GL_TEXTURE_2D);
 }
 
-void display() {
+void display()
+{
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Matrix operations
@@ -213,7 +239,8 @@ void display() {
 	glutSwapBuffers();
 }
 
-void update(int value) {
+void update(int value)
+{
 	(void)value;
 	if (!model.cameraMode) // Move the model
 	{
@@ -270,7 +297,8 @@ void update(int value) {
 	glutTimerFunc(8, update, 0);
 }
 
-void reshape(int width, int height) {
+void reshape(int width, int height)
+{
 	glViewport(0, 0, width, height);
 
 	// Apply projection matrix operations
@@ -280,17 +308,19 @@ void reshape(int width, int height) {
 	glLoadMatrixd((projectionMatrix).data[0].data());
 }
 
-void initGlutWindow(int ac, char **av) {
+void initGlutWindow(int ac, char **av)
+{
 	glutInit(&ac, av);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(W_WIDTH, W_HEIGHT);
 	glutCreateWindow(model.name.c_str());
 	glEnable(GL_DEPTH_TEST);
 	// Grey background
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f); 
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f); 
 }
 
-void initGlutEvents() {
+void initGlutEvents()
+{
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 	glutTimerFunc(8, update, 0); // 8 ticks per second update, 120 fps~
@@ -300,14 +330,17 @@ void initGlutEvents() {
 	glutSpecialUpFunc(specialKeyRelease);
 }
 
-int main(int argc, char **argv) {
-	if (argc < 3) {
+int main(int argc, char **argv)
+{
+	if (argc < 3)
+	{
 		std::cerr << "Error: Missing path to obj file or texture" << std::endl;
 		std::cerr << "Try: ./scop path/to/object.obj path/to/texture.ppm" << std::endl;
 		std::cerr << "The texture must be a ppm file" << std::endl;
 		return 1;
 	}
-	if (!model.parseObj(std::string(argv[1]))) {
+	if (!model.parseObj(std::string(argv[1])))
+	{
 		std::cerr << "Error parsing file" << std::endl;
 		return 1;
 	}
@@ -316,7 +349,11 @@ int main(int argc, char **argv) {
 	std::cout << "Welcome to scop! Press 'H' on your keyboard to display the available commands in the terminal" << std::endl;
 	initGlutWindow(argc, argv);
 	initGlutEvents();
-	model.textureID = loadTexture(argv[2]);
+	if (!loadTexture(argv[2]))
+	{
+		std::cerr << "Something went wrong when loading the texture" << std::endl;
+		return 1;
+	}
 	glutMainLoop();
 	return 0;
 }
